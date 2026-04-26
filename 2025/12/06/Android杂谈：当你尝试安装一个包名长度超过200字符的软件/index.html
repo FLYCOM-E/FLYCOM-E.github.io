@@ -1,0 +1,681 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.jpeg">
+  <link rel="icon" href="/img/fluid.jpeg">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="FlyCome">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Android杂谈：当你尝试安装一个包名长度超过200字符的软件测试这个，源于写程序处理包名缓冲区时的一个灵感 这个问题随便一个搜索引擎你都能搜到很多答案：26？30？50？100？150？这源于大多数 Apk 分发平台对软件包名长度限制的不同 但是，难道从没有人测试过，Android 系统能够接受安装的最长软件包名是多少吗？理论上，包名应该能够达到 Linux 限制的 PATH_MAX，即 25">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android杂谈：当你尝试安装一个包名长度超过200字符的软件">
+<meta property="og:url" content="http://example.com/2025/12/06/Android%E6%9D%82%E8%B0%88%EF%BC%9A%E5%BD%93%E4%BD%A0%E5%B0%9D%E8%AF%95%E5%AE%89%E8%A3%85%E4%B8%80%E4%B8%AA%E5%8C%85%E5%90%8D%E9%95%BF%E5%BA%A6%E8%B6%85%E8%BF%87200%E5%AD%97%E7%AC%A6%E7%9A%84%E8%BD%AF%E4%BB%B6/index.html">
+<meta property="og:site_name" content="FlyCome">
+<meta property="og:description" content="Android杂谈：当你尝试安装一个包名长度超过200字符的软件测试这个，源于写程序处理包名缓冲区时的一个灵感 这个问题随便一个搜索引擎你都能搜到很多答案：26？30？50？100？150？这源于大多数 Apk 分发平台对软件包名长度限制的不同 但是，难道从没有人测试过，Android 系统能够接受安装的最长软件包名是多少吗？理论上，包名应该能够达到 Linux 限制的 PATH_MAX，即 25">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-12-06T12:37:14.000Z">
+<meta property="article:modified_time" content="2026-04-26T14:50:00.125Z">
+<meta property="article:author" content="FlyCome">
+<meta property="article:tag" content="搞机-Android">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>Android杂谈：当你尝试安装一个包名长度超过200字符的软件 - FlyCome</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":77,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":false,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>FlyCome 的随心笔记</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/home.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Android杂谈：当你尝试安装一个包名长度超过200字符的软件"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        FlyCome
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-12-06 20:37" pubdate>
+          2025年12月6日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.9k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          16 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Android杂谈：当你尝试安装一个包名长度超过200字符的软件</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="Android杂谈：当你尝试安装一个包名长度超过200字符的软件"><a href="#Android杂谈：当你尝试安装一个包名长度超过200字符的软件" class="headerlink" title="Android杂谈：当你尝试安装一个包名长度超过200字符的软件"></a>Android杂谈：当你尝试安装一个包名长度超过200字符的软件</h1><p>测试这个，源于写程序处理包名缓冲区时的一个灵感</p>
+<p>这个问题随便一个搜索引擎你都能搜到很多答案：26？30？50？100？150？<br>这源于大多数 Apk 分发平台对软件包名长度限制的不同</p>
+<p>但是，难道从没有人测试过，Android 系统能够接受安装的最长软件包名是多少吗？<br>理论上，包名应该能够达到 Linux 限制的 PATH_MAX，即 255 字节左右（这里不计算 Android 在软件安装路径上加的随机字符，但这个是重要的</p>
+<p>好像没有，那么，自己动手，丰衣足食</p>
+<p>Start：</p>
+<p>刚开始我找来一个无加固软件开始改包名，50？100？150？</p>
+<p>很快，所有图形 Apk 修改工具能够修改的最长包名已经达到了，超不过 180 字节</p>
+<p>这当然不是终点，既然修改不行，那就从源头编译！<br>一番测试编译…</p>
+<p>当最后一次将包名长度增至 246 时，终于报错了（（</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs log">* What went wrong:<br>Execution failed for task &#x27;:app:dataBindingGenBaseClassesDebug&#x27;.<br>&gt; java.io.FileNotFoundException: MyBasicActivity/app/build/intermediates/data_binding_base_class_log_artifact/debug/dataBindingGenBaseClassesDebug/out/com.imtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest.app-binding_classes.json (File name too long)<br></code></pre></td></tr></table></figure>
+<p>这个报错很明显，构建工具在尝试以Apk包名作为基础名称创建一个 json 文件，但明显超过了 Linux 限制的长度 255<br>解决方法：build.gradle 改一下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs build.gradle">buildFeatures &#123;<br>    dataBinding false<br>    viewBinding false<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>继续…<br>但还是抛出了异常</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs log">* What went wrong:<br>Execution failed for task &#x27;:app:processDebugResources&#x27;.<br>&gt; A failure occurred while executing com.android.build.gradle.internal.res.LinkApplicationAndroidResourcesTask$TaskAction<br>   &gt; Android resource linking failed<br>     ERROR: MyBasicActivity/app/build/intermediates/packaged_manifests/debug/processDebugManifestForPackage/AndroidManifest.xml:2: AAPT: error: attribute &#x27;package&#x27; in &lt;manifest&gt; tag is not a valid Android package name: &#x27;com.imtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest.app&#x27;.<br></code></pre></td></tr></table></figure>
+<p>~ 构建工具 aapt 抛出的异常</p>
+<p>这应该是构建工具能达到的最长包名了（？</p>
+<p>既然编译也走不通了，常见改包名方法也就剩下 apktool、16 进制编辑器了</p>
+<p>先试试 apktool</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs shell">root@localhost ~/kotlin# apktool d app-debug.apk -o app_dir<br>I: Using Apktool 2.7.0-dirty on app-debug.apk<br>I: Loading resource table...<br>I: Decoding AndroidManifest.xml with resources...<br>I: Loading resource table from file: /root/.local/share/apktool/framework/1.apk<br>I: Renamed manifest package found! Replacing com.imtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest.app with com.imtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttestt<br>I: Decoding file-resources...<br>I: Decoding values */* XMLs...<br>I: Baksmaling classes.dex...<br>I: Baksmaling classes2.dex...<br>I: Baksmaling classes3.dex...<br>I: Baksmaling classes4.dex...<br>I: Baksmaling classes5.dex...<br>I: Copying assets and libs...<br>I: Copying unknown files...<br>I: Copying original files...<br>I: Copying META-INF/services directory<br>root@localhost ~/kotlin#<br></code></pre></td></tr></table></figure>
+<p>解压后修改相关 xml、文件内包名<br>重新打包又炸了：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs log">brut.androlib.AndrolibException: brut.common.BrutException: could not exec (exit code = 1): [aapt, p, --min-sdk-version, 21, --target-sdk-version, 34, --rename-manifest-package, com.imtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest.ap<br></code></pre></td></tr></table></figure>
+<p>由于解包Apk时连带解包了资源文件，apktool 又调用构建工具中的 aapt 打包资源，并把修改的超长包名以参数形式传给了 aapt，aapt 再次拒绝了这个超长包名参数，并返回 exit code 1，导致打包终止</p>
+<p>既然 aapt 拒绝这个包名，总不能…改 aapt 吧（（<br>只能想法让 apktool 不要调用 aapt 打包资源</p>
+<p>查了一下，可以用 -r 参数解压避免解压资源文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell">apktool d -r app-debug.apk -o app_dir<br><br>apktool b app_dir -o app-debug_1.apk<br></code></pre></td></tr></table></figure>
+<p>成功打包，签名 Apk</p>
+<p>这样我们就成功拿到一个包名长度为 246 字符的软件（）</p>
+<p>接下来就是测试环节了</p>
+<p>测试在虚拟机： 两仪 Android 8.1.0 进行</p>
+<p>之所以选择虚拟机是因为这种测试还没人做过，一旦出 bug 很可能在系统引起奇怪的问题或残留（<br>为什么选择两仪：两仪提供了一个近乎完全原生的 Android 8.1 系统环境，是经典的系统版本之一，保证测试质量</p>
+<p>刚开始我尝试使用 pm install 来安装，但 pm 似乎卡住了（（既安装不上也无任何反应</p>
+<p>命令行不通？那还是图形吧。</p>
+<p>打开 “文件” ~ 右上角三点 ~ 打开显示内部储存，左上角菜单，点内部储存，进入内部储存找到 Apk 点击…</p>
+<p>正常进入软件包安装程序，点击安装…</p>
+<p>一切正常…吗？</p>
+<p>软件安装卡在最后的部分…90% 的位置不动了，但没有弹出无响应，系统也没有卡死</p>
+<p>很明显：出 bug 了</p>
+<p>既然是 bug，当然要去抓 logcat</p>
+<p>就在我输完 <code>logcat &gt;&gt;/sdcard/debug.log</code> 之后返回来时发现：前台在桌面！</p>
+<p>这里怎么判断发生了什么呢？一般来说只有前台界面崩溃或系统重启才会在桌面</p>
+<p>有个技巧，Android 8.1 可以在设置-系统-关于设备-状态信息里看到已开机时间<br>但这里千万别去看，因为某些原因，两仪系统里显示的是主系统的总开机时间（（</p>
+<p>这里看不了，还记得刚刚抓的 log 吗？</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs log">12-06 17:57:52.150 24465 24625 I ActivityManager: START u0 &#123;act=android.intent.action.VIEW dat=file:///data/user_de/0/com.android.packageinstaller/no_backup/package2365387567240456731.apk flg=0x10000 cmp=com.android.packageinstaller/.PackageInstallerActivity (has extras)&#125; from uid 10009<br>12-06 17:57:52.344 24977 24977 I PackageInstaller: No source found for package com.imtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest.app<br></code></pre></td></tr></table></figure>
+<p>这段 log 显示了系统永远不会显示在前台的东西：</p>
+<p>17:57:52.150：ActivityManager 显示启动了 <code>com.android.packageinstaller</code> 安装 &#x2F;data&#x2F;user_de&#x2F;0&#x2F;com.android.packageinstaller&#x2F;no_backup&#x2F;package2365387567240456731.apk，安装开始</p>
+<p>17:57:52.344：PackageInstaller 爆出了一个错误：No source found for package com.imtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest.app</p>
+<p>没错，PackageInstaller“不识别”这个包，准确来说是安装过程已经出现了问题</p>
+<p>但这里没完，PackageInstaller 貌似陷入了一种卡死循环状态</p>
+<p>为什么这么说？看这段log：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><code class="hljs log">12-06 18:00:40.537 24465 24670 W Watchdog: Failed to write to /proc/sysrq-trigger<br>12-06 18:00:40.537 24465 24670 W Watchdog: java.io.FileNotFoundException: /proc/sysrq-trigger (Permission denied)<br>12-06 18:00:40.537 24465 24670 W Watchdog: 	at java.io.FileOutputStream.open0(Native Method)<br>12-06 18:00:40.537 24465 24670 W Watchdog: 	at java.io.FileOutputStream.open(FileOutputStream.java:287)<br>12-06 18:00:40.537 24465 24670 W Watchdog: 	at java.io.FileOutputStream.&lt;init&gt;(FileOutputStream.java:223)<br>12-06 18:00:40.537 24465 24670 W Watchdog: 	at java.io.FileOutputStream.&lt;init&gt;(FileOutputStream.java:110)<br>12-06 18:00:40.537 24465 24670 W Watchdog: 	at java.io.FileWriter.&lt;init&gt;(FileWriter.java:63)<br>12-06 18:00:40.537 24465 24670 W Watchdog: 	at com.android.server.Watchdog.doSysRq(Watchdog.java:586)<br>12-06 18:00:40.537 24465 24670 W Watchdog: 	at com.android.server.Watchdog.run(Watchdog.java:518)<br>12-06 18:00:40.538 24465 24670 W Watchdog: Failed to write to /proc/sysrq-trigger<br>12-06 18:00:40.538 24465 24670 W Watchdog: java.io.FileNotFoundException: /proc/sysrq-trigger (Permission denied)<br>12-06 18:00:40.538 24465 24670 W Watchdog: 	at java.io.FileOutputStream.open0(Native Method)<br>12-06 18:00:40.538 24465 24670 W Watchdog: 	at java.io.FileOutputStream.open(FileOutputStream.java:287)<br>12-06 18:00:40.538 24465 24670 W Watchdog: 	at java.io.FileOutputStream.&lt;init&gt;(FileOutputStream.java:223)<br>12-06 18:00:40.538 24465 24670 W Watchdog: 	at java.io.FileOutputStream.&lt;init&gt;(FileOutputStream.java:110)<br>12-06 18:00:40.538 24465 24670 W Watchdog: 	at java.io.FileWriter.&lt;init&gt;(FileWriter.java:63)<br>12-06 18:00:40.538 24465 24670 W Watchdog: 	at com.android.server.Watchdog.doSysRq(Watchdog.java:586)<br>12-06 18:00:40.538 24465 24670 W Watchdog: 	at com.android.server.Watchdog.run(Watchdog.java:519)<br>12-06 18:00:40.581 24465 24670 W Watchdog: *** WATCHDOG KILLING SYSTEM PROCESS: Blocked in handler on PackageManager (PackageManager)<br>12-06 18:00:40.581 24465 24670 W Watchdog: PackageManager stack trace:<br>12-06 18:00:40.582 24465 24670 W Watchdog:     at java.io.UnixFileSystem.checkAccess0(Native Method)<br>12-06 18:00:40.582 24465 24670 W Watchdog:     at java.io.UnixFileSystem.checkAccess(UnixFileSystem.java:252)<br>12-06 18:00:40.582 24465 24670 W Watchdog:     at java.io.File.exists(File.java:807)<br>12-06 18:00:40.582 24465 24670 W Watchdog:     at com.android.server.pm.PackageManagerService.getNextCodePath(PackageManagerService.java:17613)<br>12-06 18:00:40.582 24465 24670 W Watchdog:     at com.android.server.pm.PackageManagerService.-wrap19(Unknown Source:0)<br>12-06 18:00:40.582 24465 24670 W Watchdog:     at com.android.server.pm.PackageManagerService$FileInstallArgs.doRename(PackageManagerService.java:17029)<br>12-06 18:00:40.582 24465 24670 W Watchdog:     at com.android.server.pm.PackageManagerService.installPackageLI(PackageManagerService.java:18927)<br>12-06 18:00:40.582 24465 24670 W Watchdog:     at com.android.server.pm.PackageManagerService.installPackageTracedLI(PackageManagerService.java:18528)<br>12-06 18:00:40.582 24465 24670 W Watchdog:     at com.android.server.pm.PackageManagerService.-wrap33(Unknown Source:0)<br>12-06 18:00:40.582 24465 24670 W Watchdog:     at com.android.server.pm.PackageManagerService$8.run(PackageManagerService.java:15989)<br>12-06 18:00:40.582 24465 24670 W Watchdog:     at android.os.Handler.handleCallback(Handler.java:790)<br>12-06 18:00:40.582 24465 24670 W Watchdog:     at android.os.Handler.dispatchMessage(Handler.java:99)<br>12-06 18:00:40.582 24465 24670 W Watchdog:     at android.os.Looper.loop(Looper.java:164)<br>12-06 18:00:40.582 24465 24670 W Watchdog:     at android.os.HandlerThread.run(HandlerThread.java:65)<br>12-06 18:00:40.582 24465 24670 W Watchdog:     at com.android.server.ServiceThread.run(ServiceThread.java:46)<br>12-06 18:00:40.582 24465 24670 W Watchdog: *** GOODBYE!<br>12-06 18:00:40.583 24465 24670 I Process : Sending signal. PID: 24465 SIG: 9<br></code></pre></td></tr></table></figure>
+<p>三分钟后（即18:00:40），系统底层的 Watchdog （看门狗）触发并抛出了完整堆栈，关键日志：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs log">12-06 18:00:40.537 24465 24670 W Watchdog: Failed to write to /proc/sysrq-trigger<br></code></pre></td></tr></table></figure>
+<p>Watchdog：多久没喂狗了😠😠</p>
+<p>随即，Watchdog kill 了某关键进程</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs log">12-06 18:00:40.582 24465 24670 W Watchdog: *** GOODBYE!<br>12-06 18:00:40.583 24465 24670 I Process : Sending signal. PID: 24465 SIG: 9<br></code></pre></td></tr></table></figure>
+<p>这里解释了为什么系统软重启</p>
+<p>测试结果很明显了：成功触发了 Android PackageManagerService 一个可能的未知 bug，并且阻塞了 system_server<br>当然，这需要广泛的系统版本测试验证</p>
+<p>回到开始前的那个问题：Android 系统能够接受安装的最长软件包名是多少？</p>
+<p>好了，篇幅很长了，感谢你能看到这里👍👍</p>
+<p>“GOODBYE!”</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E6%90%9E%E6%9C%BA-Android/" class="print-no-link">#搞机-Android</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Android杂谈：当你尝试安装一个包名长度超过200字符的软件</div>
+      <div>http://example.com/2025/12/06/Android杂谈：当你尝试安装一个包名长度超过200字符的软件/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>FlyCome</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年12月6日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/02/17/%E4%B8%80%E4%BA%9B%E6%9C%AA%E5%88%86%E7%B1%BB%E5%A4%87%E4%BB%BD/" title="一些未分类 Android 属性备份">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">一些未分类 Android 属性备份</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/09/06/%E8%AE%B0%E4%B8%80%E6%AC%A1%E4%BF%AE%E6%94%B9%E7%94%B5%E8%84%91%E5%A4%9A%E7%B3%BB%E7%BB%9F%E5%88%86%E5%8C%BA%E8%BF%87%E7%A8%8B%E5%8F%8A%E8%B8%A9%E5%9D%91/" title="记一次修改电脑多系统分区过程及踩坑">
+                        <span class="hidden-mobile">记一次修改电脑多系统分区过程及踩坑</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+    <div id="giscus" class="giscus"></div>
+    <script type="text/javascript">
+      Fluid.utils.loadComments('#giscus', function() {
+        var options = {"repo":"FLYCOM-E/FLYCOM-E.github.io","repo-id":"R_kgDORRc0YA","category":"Announcements","category-id":"DIC_kwDORRc0YM4C2jyS","theme-light":"light","theme-dark":"dark","mapping":"pathname","reactions-enabled":1,"emit-metadata":0,"input-position":"top","lang":"zh-CN"};
+        var attributes = {};
+        for (let option in options) {
+          if (!option.startsWith('theme-')) {
+            var key = option.startsWith('data-') ? option : 'data-' + option;
+            attributes[key] = options[option];
+          }
+        }
+        var light = 'light';
+        var dark = 'dark';
+        window.GiscusThemeLight = light;
+        window.GiscusThemeDark = dark;
+        attributes['data-theme'] = document.documentElement.getAttribute('data-user-color-scheme') === 'dark' ? dark : light;
+        for (let attribute in attributes) {
+          var value = attributes[attribute];
+          if (value === undefined || value === null || value === '') {
+            delete attributes[attribute];
+          }
+        }
+        var s = document.createElement('script');
+        s.setAttribute('src', 'https://giscus.app/client.js');
+        s.setAttribute('crossorigin', 'anonymous');
+        for (let attribute in attributes) {
+          s.setAttribute(attribute, attributes[attribute]);
+        }
+        var ss = document.getElementsByTagName('script');
+        var e = ss.length > 0 ? ss[ss.length - 1] : document.head || document.documentElement;
+        e.parentNode.insertBefore(s, e.nextSibling);
+      });
+    </script>
+    <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://github.com/FLYCOM-E" target="_blank" rel="nofollow noopener"><span>FlyCome 的随心笔记区</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/wanko.model.json"},"display":{"position":"right","width":150,"height":300,"hOffset":0,"vOffset":-20},"mobile":{"show":false},"react":{"opacity":0.8},"log":false});</script></body>
+</html>
